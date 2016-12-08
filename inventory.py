@@ -1,6 +1,8 @@
 class Inventory(object):
     """This class maintains an inventory of products with quantities
 
+    It maintains state for a product inventory and a back-order inventory.
+
     """
 
     def __init__(self):
@@ -15,14 +17,21 @@ class Inventory(object):
 
     def fulfill_order(self, name, quantity):
         if self.entries[name] == 0:
-            self.back_order[name] = quantity
             # create back order
+            self.back_order[name] = quantity
+            return 0
         elif self.entries[name] >= quantity:
             self.entries[name] -= quantity
+            return quantity
         else:
             # fulfill partial
             self.back_order[name] = abs(self.entries[name] - quantity)
+            fulfilled_order = self.entries[name]
             self.entries[name] = 0
+            return fulfilled_order
 
     def lookup_back_order(self, name):
-        return self.back_order[name]
+        if name in self.back_order:
+            return self.back_order[name]
+        else:
+            return 0

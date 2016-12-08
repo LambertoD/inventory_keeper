@@ -4,12 +4,6 @@ from product_orders import ProductOrder
 
 class Order(unittest.TestCase):
 
-    # def setUp(self):
-    #     self.order = ProductOrder()
-
-    # def tearDown(self):
-    #     pass
-
     # def test_create_product_order_with_class_method(self):
     #     header = "1"
     #     order_lines = [('A', 1), ('B', 1), ('C', 1), ('D', 1)]
