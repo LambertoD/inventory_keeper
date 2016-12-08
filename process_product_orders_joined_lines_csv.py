@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 
 import argparse
-import pickle
+import csv
 import sys
 from inventory import Inventory
 from product_orders import ProductOrder
+import pytest
 
 # ====
 # MAIN
@@ -18,7 +19,7 @@ def main():
 
     parser.add_argument('-i', '--input-path', required=True,
                         dest='input_path', metavar='PATH', action='store',
-                        help='Path of input stream file to use with test')
+                        help='Path of input file to use with test')
 
     parser.add_argument('-q', '--inventory-qty',
                         dest='inventory_qty', type=int, action='store',
@@ -41,21 +42,19 @@ def main():
     # inventory.add('D', 0)
     # inventory.add('E', 0)
 
-    with open(csv_input_file, 'rb') as handle:
-        input_stream = pickle.load(handle)
+    # READ IN CSV FILE OF ORDERS AND CONVERT TO A DICT OBJECT
+    file_rows = []
+    with open(csv_input_file, 'rU') as f:
+        f_csv = csv.DictReader(f)
+        for row in f_csv:
+            file_rows.append(row)
 
     # TRANSFORM EACH RECORD INTO A PRODUCT ORDER OBJECT
     order_history = []
-    for index, csv_row in enumerate(input_stream):
+    for index, csv_row in enumerate(file_rows):
         header = csv_row['Header']
         lines = csv_row['Lines']
-
-        # format order_lines as 'A:1,B:2,C:3,D:4,E:5'
-        order_list = \
-            ["{}:{}".format(x['Product'], x['Quantity']) for x in lines]
-        order_lines = ''
-        for line in order_list:
-            order_lines = order_lines.join(line)
+        order_lines = lines.replace('"', '')
         try:
             order = ProductOrder(header, order_lines)
             inventory_depleted, order_status = process_order(order, inventory)
