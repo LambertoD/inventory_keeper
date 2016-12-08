@@ -46,6 +46,7 @@ class InventoryTest(unittest.TestCase):
     def test_back_order_for_product_with_good_inventory(self):
         self.inventory.add("A", 0)
         self.assertEqual(0, self.inventory.lookup_back_order("B"))
+        self.assertFalse(self.inventory.has_back_order("B"))
 
     def test_back_orders_for_multiple_orders_exhausting_product(self):
         self.inventory.add("A", 5)
@@ -55,9 +56,21 @@ class InventoryTest(unittest.TestCase):
         order2 = self.inventory.fulfill_order("A", 1)
         self.assertEqual(0, order2)
         self.assertEqual(1, self.inventory.lookup_back_order("A"))
-        order3 = self.inventory.fulfill_order("A", 2)
+        order3 = self.inventory.fulfill_order("A", 5)
         self.assertEqual(0, order3)
-        self.assertEqual(3, self.inventory.lookup_back_order("A"))
+        self.assertEqual(6, self.inventory.lookup_back_order("A"))
+        order4 = self.inventory.fulfill_order("A", 1)
+        self.assertEqual(0, order4)
+        self.assertEqual(7, self.inventory.lookup_back_order("A"))
+
+    def test_back_order_status(self):
+        self.inventory.add("A", 3)
+        order1 = self.inventory.fulfill_order("A", 2)
+        self.assertEqual(2, order1)
+        self.assertFalse(self.inventory.has_back_order("A"))
+        order2 = self.inventory.fulfill_order("A", 2)
+        self.assertEqual(1, order2)
+        self.assertTrue(self.inventory.has_back_order("A"))
 
     def test_reduce_inventory_for_a_partial_satisfy_order(self):
         self.inventory.add("A", 3)

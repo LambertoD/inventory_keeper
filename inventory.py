@@ -8,6 +8,7 @@ class Inventory(object):
     def __init__(self):
         self.entries = {}
         self.back_order = {}
+        self.back_order_status = {}
 
     def add(self, name, quantity):
         self.entries[name] = quantity
@@ -18,6 +19,7 @@ class Inventory(object):
     def fulfill_order(self, name, quantity):
         if self.entries[name] == 0:
             # create back order
+            self.back_order_status[name] = True
             if name in self.back_order:
                 self.back_order[name] += quantity
             else:
@@ -28,6 +30,7 @@ class Inventory(object):
             return quantity
         else:
             # fulfill partial
+            self.back_order_status[name] = True
             self.back_order[name] = abs(self.entries[name] - quantity)
             fulfilled_order = self.entries[name]
             self.entries[name] = 0
@@ -38,3 +41,8 @@ class Inventory(object):
             return self.back_order[name]
         else:
             return 0
+
+    def has_back_order(self, name):
+        if name in self.back_order_status:
+            return self.back_order_status[name]
+        return False
