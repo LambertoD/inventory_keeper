@@ -62,4 +62,5 @@ Step 2: Run cli to generate inventory report
 `$ python process_product_orders.py -i data/stream_file.txt -q 5`
 
 "-i" is the path to the input csv file and
+
 "q" is the initial quantity value for each product in inventory:
