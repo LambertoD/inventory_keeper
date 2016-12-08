@@ -18,7 +18,10 @@ class Inventory(object):
     def fulfill_order(self, name, quantity):
         if self.entries[name] == 0:
             # create back order
-            self.back_order[name] = quantity
+            if name in self.back_order:
+                self.back_order[name] += quantity
+            else:
+                self.back_order[name] = quantity
             return 0
         elif self.entries[name] >= quantity:
             self.entries[name] -= quantity
