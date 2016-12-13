@@ -71,12 +71,13 @@ def main():
                 break
 
         except ValueError as e:
-            error_msg = "Error occured during execution: %s\n%s\n" \
-                % (e.__class__.__name__, e.message)
+            error_msg = "Error occured during execution: %s %s" \
+                % (e.__class__.__name__, e)
             logging.error(error_msg)
-            message = "\n*** WARNING: Order \'{0}\' with items \'{}\' was" \
-                "not processed".format(order.get_id(), order.order_details())
+            message = "*** ERROR: Order \'{}\' with items \'{}\' was " \
+                "not processed".format(header, lines)
             logging.error(message)
+            pass
 
     print_order_history(order_history)
 
