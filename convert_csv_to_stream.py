@@ -44,17 +44,17 @@ def main():
         if csv_row['Product:A'] and int(csv_row['Product:A']) > 0:
             stream['Lines'].append({"Product": "A",
                                     "Quantity": csv_row['Product:A']})
-        elif csv_row['Product:B'] and int(csv_row['Product:B']) > 0:
+        if csv_row['Product:B'] and int(csv_row['Product:B']) > 0:
             stream['Lines'].append({"Product": "B",
                                     "Quantity": csv_row['Product:B']})
-        elif csv_row['Product:C'] and int(csv_row['Product:C']) > 0:
+        if csv_row['Product:C'] and int(csv_row['Product:C']) > 0:
             stream['Lines'].append({"Product": "C",
                                     "Quantity": csv_row['Product:C']})
-        elif csv_row['Product:D'] and int(csv_row['Product:D']) > 0:
+        if csv_row['Product:D'] and int(csv_row['Product:D']) > 0:
             stream['Lines'].append({"Product": "D",
                                     "Quantity": csv_row['Product:D']})
-        elif csv_row['Product:E'] and int(csv_row['Product:E']) > 0:
-            stream['Lines'].append({"Product": "C",
+        if csv_row['Product:E'] and int(csv_row['Product:E']) > 0:
+            stream['Lines'].append({"Product": "E",
                                     "Quantity": csv_row['Product:E']})
         stream_rows.append(stream)
 

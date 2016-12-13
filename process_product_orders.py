@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
+import logging
 import pickle
 import sys
 from inventory import Inventory
@@ -25,12 +26,18 @@ def main():
                         help='Setting for initial inventory quantity, '
                              'default is 100')
 
+    # SETUP LOGGING
+    logging.basicConfig(filename='log/inventory_keeper.log',
+                        filemode='w', level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s | %(message)s')
+    logging.info('\n%s\nSTART Order Processing Session\n%s' %
+                 ('-' * 108, '-' * 108))
     # COLLECT COMMAND LINE ARGUMENTS
     cl_args = parser.parse_args()
     csv_input_file = cl_args.input_path
 
     # SET INITIAL INVENTORY WITH EACH PRODUCT QUANTITY EQUAL TO 100
-    qty_per_product = cl_args.inventory_qty if cl_args else 100
+    qty_per_product = cl_args.inventory_qty if cl_args.inventory_qty else 100
     inventory = Inventory()
     for product in PRODUCTS:
         inventory.add(product, qty_per_product)
@@ -47,15 +54,14 @@ def main():
     # TRANSFORM EACH RECORD INTO A PRODUCT ORDER OBJECT
     order_history = []
     for index, csv_row in enumerate(input_stream):
+        logging.info('Processing Order: {}'.format(csv_row))
         header = csv_row['Header']
         lines = csv_row['Lines']
 
         # format order_lines as 'A:1,B:2,C:3,D:4,E:5'
         order_list = \
             ["{}:{}".format(x['Product'], x['Quantity']) for x in lines]
-        order_lines = ''
-        for line in order_list:
-            order_lines = order_lines.join(line)
+        order_lines = ','.join(order_list)
         try:
             order = ProductOrder(header, order_lines)
             inventory_depleted, order_status = process_order(order, inventory)
@@ -65,9 +71,17 @@ def main():
                 break
 
         except ValueError as e:
-            print(e)
+            error_msg = "Error occured during execution: %s\n%s\n" \
+                % (e.__class__.__name__, e.message)
+            logging.error(error_msg)
+            message = "\n*** WARNING: Order \'{0}\' with items \'{}\' was" \
+                "not processed".format(order.get_id(), order.order_details())
+            logging.error(message)
 
     print_order_history(order_history)
+
+    logging.info('\n%s\nEND Order Processing Session\n%s' %
+                 ('-' * 108, '-' * 108))
 
 
 def process_order(order, inventory):
@@ -79,7 +93,7 @@ def process_order(order, inventory):
     print_order_part2 = format_order_line(products, header, details)
     orders_fulfilled = {}
     back_orders_for_order = {}
-    for item in order.order_details():
+    for item in details:
         product = list(item.keys())[0]
         quantity = list(item.values())[0]
         if inventory_has_products(inventory):
@@ -94,6 +108,10 @@ def process_order(order, inventory):
             # message = "Inventory Exhausted. Can't process more orders"
             orders_fulfilled[product] = 0
             inventory_exhausted = True
+            logging.info('\n%s Inventory Exhausted.  Stop processing '
+                         'more orders%s' %
+                         ('>' * 10, '<' * 10))
+
     print_order_part3 = format_order_line(products, header, orders_fulfilled)
     # back_orders = get_back_orders(products, inventory)
     print_order_part4 = format_order_line(products, header,
@@ -108,6 +126,8 @@ def inventory_has_products(inventory):
     total_quantity = 0
     for product in PRODUCTS:
         total_quantity += inventory.lookup(product)
+    # print("current inventory: {}".format(inventory.entries))
+    # print(total_quantity)
     return total_quantity != 0
 
 
