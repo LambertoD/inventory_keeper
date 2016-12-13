@@ -41,6 +41,7 @@ def main():
     inventory = Inventory()
     for product in PRODUCTS:
         inventory.add(product, qty_per_product)
+    print_current_inventory(inventory)
     # Test example inventory with uneven quantities
     # inventory.add('A', 2)
     # inventory.add('B', 3)
@@ -90,7 +91,7 @@ def process_order(order, inventory):
     header = order.get_id()
     details = order.order_details()
     products = list(PRODUCTS)
-    print_order_part1 = '{}: '.format(header)
+    print_order_part1 = '{:^7}: '.format(header)
     print_order_part2 = format_order_line(products, header, details)
     orders_fulfilled = {}
     back_orders_for_order = {}
@@ -118,8 +119,8 @@ def process_order(order, inventory):
     print_order_part4 = format_order_line(products, header,
                                           back_orders_for_order)
     order_status = \
-        "{} {}::{}::{}".format(print_order_part1, print_order_part2,
-                               print_order_part3, print_order_part4)
+        "{}{}::{}::{}".format(print_order_part1, print_order_part2,
+                              print_order_part3, print_order_part4)
     return (inventory_exhausted, order_status)
 
 
@@ -146,8 +147,9 @@ def format_order_line(products, header, details):
                 order[product] = details[product]
             else:
                 order[product] = 0
-    return "{},{},{},{},{}".format(order['A'], order['B'],
-                                   order['C'], order['D'], order['E'])
+    return "{:^3},{:^3},{:^3},{:^3},{:^3}".format(order['A'], order['B'],
+                                                  order['C'], order['D'],
+                                                  order['E'])
 
 
 def get_back_orders(products, inventory):
@@ -157,7 +159,25 @@ def get_back_orders(products, inventory):
     return back_order
 
 
+def print_current_inventory(inventory):
+    print("{}".format('-' * 80))
+    print("{}{:^40}{}".format('*' * 3, "CURRENT INVENTORY", '*' * 3))
+    print("{}{:^40}{}".format('*' * 3, "PRODUCTS", '*' * 3))
+    print("{}{:^30}".format(' ' * 9, "A  |  B  |  C  |  D  |  E"))
+    qtys = [inventory.lookup(product) for product in PRODUCTS]
+    print("Quantity: {0[0]:^3}   {0[1]:^3}   {0[2]:^3}   {0[3]:^3}   {0[4]:^3}"
+          "".format(qtys))
+
+    print("{}\n".format('-' * 80))
+
+
 def print_order_history(order_history):
+    print("{}".format('=' * 80))
+    print(" ORDER ||  ORDER DETAILS    || QUANTITY ALLOCATED|| QUANTITY BACK-ORDERED")
+    print("HEADER || ---------------   || ------------------|| ---------------------")
+    print("       ||   PRODUCTS        ||     PRODUCTS      ||       PRODUCTS ")
+    print("       || A | B | C | D | E || A | B | C | D | E || A | B | C | D | E   ")
+    print("{}".format('=' * 80))
     for item in order_history:
         print(item)
 
